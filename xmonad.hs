@@ -14,6 +14,7 @@ import XMonad.Util.EZConfig -- For Emacs style keybindings
 import XMonad.Hooks.ManageHelpers -- set floating pos&scale
 import XMonad.Util.Run -- For spawnPipe
 import XMonad.Hooks.ManageDocks -- automatically manage infobar/dock spacing
+import XMonad.Actions.CycleWS -- Cycle through workspaces
 
 
 import qualified XMonad.StackSet as W
@@ -65,7 +66,7 @@ myFocusedBorderColor = "#ff0000"
 myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- launch a terminal
-    [ ((modm .|. shiftMask, xK_t), spawn $ XMonad.terminal conf)
+    [ ((modm .|. mod1Mask, xK_t), spawn $ XMonad.terminal conf)
 
     -- launch dmenu
     , ((modm .|. mod1Mask,               xK_b     ), spawn "dmenu_run")
@@ -106,11 +107,6 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- Swap the focused window with the previous window
     , ((modm .|. shiftMask, xK_k     ), windows W.swapUp    )
 
-    -- Shrink the master area
-    , ((modm,               xK_h     ), sendMessage Shrink)
-
-    -- Expand the master area
-    , ((modm,               xK_l     ), sendMessage Expand)
 
     -- Push window back into tiling
     , ((modm,               xK_t     ), withFocused $ windows . W.sink)
@@ -144,7 +140,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     --
     [((m .|. modm, k), windows $ f i)
         | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
-        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
+        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
     ++
 
     --
@@ -215,22 +211,19 @@ myLayout = avoidStruts (tiled ||| Mirror tiled ||| Full)
 -- To match on the WM_NAME, you can use 'title' in the same way that
 -- 'className' and 'resource' are used below.
 --
--- myManageHook = composeAll
---     [ className =? "MPlayer"        --> doFloat
---     , className =? "Gimp"           --> doFloat
---     , className =? "Blender"        --> doFloat
---     , resource  =? "desktop_window" --> doIgnore
---     , resource  =? "kdesktop"       --> doIgnore ]
---     <+> manageDocks
+myManageHook = composeAll
+    [ className =? "MPlayer"        --> doFloat
+    , className =? "Gimp"           --> doFloat
+    , className =? "Blender"        --> doFullFloat
+    , resource  =? "desktop_window" --> doIgnore
+    , resource  =? "kdesktop"       --> doIgnore ]
+    <+> manageDocks
 
-myManageHook = composeOne [
-  isKDETrayWindow -?> doIgnore,
-    transience,
-    isFullscreen -?> doFullFloat,
-    resource =? "stalonetray" -?> doIgnore
-    isInProperty "WM_NAME(STRING)" "Blender" -?> doFullFloat
-  ]
-  <+> manageDocks
+-- myManageHook = composeOne [
+--   isKDETrayWindow -?> doIgnore,
+--   isInProperty "WM_NAME" "Blender" -?> doFullFloat
+--   ]
+--   <+> manageDocks
 
 
 ------------------------------------------------------------------------
@@ -271,13 +264,16 @@ main = do
   xmproc <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
   xmonad $ defaults
     `additionalKeysP`
-    [ ("M-S-<Return>", spawn "urxvt")
-    , ("M-x r", spawn "xmonad --recompile; xmonad --restart")
+    [ ("M-x r", spawn "xmonad --recompile; xmonad --restart")
     , ("M-S-b", spawn "dmenu_run")
     , ("M-d", windows W.focusDown)
     , ("M-a", windows W.focusUp)
     , ("M-S-d", windows W.swapDown)
     , ("M-S-a", windows W.swapUp)
+    , ("M-S-q", shiftToNext)
+    , ("M-S-e", shiftToPrev)
+    , ("M-q", nextScreen)
+    , ("M-e", prevScreen)
     , ("M-S-\\", kill)
     , ("M-S-8", sendMessage Shrink)
     , ("M-S-9", sendMessage Expand)
