@@ -15,6 +15,11 @@ import XMonad.Hooks.ManageHelpers -- set floating pos&scale
 import XMonad.Util.Run -- For spawnPipe
 import XMonad.Hooks.ManageDocks -- automatically manage infobar/dock spacing
 import XMonad.Actions.CycleWS -- Cycle through workspaces
+import XMonad.Actions.SpawnOn -- Spawn apps on specific workspaces
+import XMonad.Layout.IndependentScreens -- Bind workspaces to screens
+
+-- Debug
+import XMonad.Layout.ShowWName
 
 
 import qualified XMonad.StackSet as W
@@ -23,7 +28,7 @@ import qualified Data.Map        as M
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
-myTerminal      = "xterm"
+myTerminal      = "urxvt"
 
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
@@ -53,12 +58,15 @@ myModMask       = mod4Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
+-- myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
+
+myWorkspaces = withScreens 3 ["terminal", "systemMonitor", "torrent", "content", "creation"]
+
 
 -- Border colors for unfocused and focused windows, respectively.
 --
 myNormalBorderColor  = "#dddddd"
-myFocusedBorderColor = "#ff0000"
+myFocusedBorderColor = "#fd971f"
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -68,54 +76,30 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- launch a terminal
     [ ((modm .|. mod1Mask, xK_t), spawn $ XMonad.terminal conf)
 
-    -- launch dmenu
-    , ((modm .|. mod1Mask,               xK_b     ), spawn "dmenu_run")
 
-    -- launch gmrun
-    , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
 
-    -- close focused window
-    , ((modm .|. shiftMask, xK_c     ), kill)
 
-     -- Rotate through the available layout algorithms
-    , ((modm,               xK_space ), sendMessage NextLayout)
-
-    --  Reset the layouts on the current workspace to default
-    , ((modm .|. shiftMask, xK_space ), setLayout $ XMonad.layoutHook conf)
+    -- --  Reset the layouts on the current workspace to default
+    -- , ((modm .|. shiftMask, xK_space ), setLayout $ XMonad.layoutHook conf)
 
     -- Resize viewed windows to the correct size
-    , ((modm,               xK_n     ), refresh)
-
-    -- Move focus to the next window
-    , ((modm,               xK_Tab   ), windows W.focusDown)
-
-    -- Move focus to the next window
-    , ((modm,               xK_j     ), windows W.focusDown)
-
-    -- Move focus to the previous window
-    , ((modm,               xK_k     ), windows W.focusUp  )
+    -- , ((modm,               xK_n     ), refresh)
 
     -- Move focus to the master window
-    , ((modm,               xK_m     ), windows W.focusMaster  )
+    -- , ((modm,               xK_m     ), windows W.focusMaster  )
 
-    -- Swap the focused window and the master window
-    , ((modm,               xK_Return), windows W.swapMaster)
-
-    -- Swap the focused window with the next window
-    , ((modm .|. shiftMask, xK_j     ), windows W.swapDown  )
-
-    -- Swap the focused window with the previous window
-    , ((modm .|. shiftMask, xK_k     ), windows W.swapUp    )
+    -- -- Swap the focused window and the master window
+    -- , ((modm,               xK_Return), windows W.swapMaster)
 
 
     -- Push window back into tiling
     , ((modm,               xK_t     ), withFocused $ windows . W.sink)
 
     -- Increment the number of windows in the master area
-    , ((modm              , xK_comma ), sendMessage (IncMasterN 1))
+    -- , ((modm              , xK_comma ), sendMessage (IncMasterN 1))
 
     -- Deincrement the number of windows in the master area
-    , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
+    -- , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
 
     -- Toggle the status bar gap
     -- Use this binding with avoidStruts from Hooks.ManageDocks.
@@ -138,9 +122,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- mod-[1..9], Switch to workspace N
     -- mod-shift-[1..9], Move client to workspace N
     --
-    [((m .|. modm, k), windows $ f i)
-        | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
-        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+    [((m .|. modm, k), windows $ onCurrentScreen f i)
+        | (i, k) <- zip (workspaces' conf) [xK_1 .. xK_9]
+        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
     ++
 
     --
@@ -215,6 +199,7 @@ myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Gimp"           --> doFloat
     , className =? "Blender"        --> doFullFloat
+    , className =? "Emacs"          --> doShift "3"
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore ]
     <+> manageDocks
@@ -261,11 +246,13 @@ myStartupHook = return ()
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main = do
+  spawn "xsetroot -solid \"#272822\""
+  spawn "xrdb Xresources"
   xmproc <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
   xmonad $ defaults
     `additionalKeysP`
     [ ("M-x r", spawn "xmonad --recompile; xmonad --restart")
-    , ("M-S-b", spawn "dmenu_run")
+    , ("M-S-`", spawn "dmenu_run")
     , ("M-d", windows W.focusDown)
     , ("M-a", windows W.focusUp)
     , ("M-S-d", windows W.swapDown)
@@ -274,11 +261,13 @@ main = do
     , ("M-S-e", shiftToPrev)
     , ("M-q", nextScreen)
     , ("M-e", prevScreen)
-    , ("M-S-\\", kill)
-    , ("M-S-8", sendMessage Shrink)
-    , ("M-S-9", sendMessage Expand)
-    , ("M-S-u", sendMessage NextLayout)
-    , ("M-x e", spawn "emacs")
+    , ("M-S-<Esc>", kill)
+    , ("M-S-1", sendMessage Shrink)
+    , ("M-S-2", sendMessage Expand)
+    , ("M-S-r", sendMessage NextLayout)
+    , ("M-x e", spawnOn "creation" "emacs")
+    , ("M-x t", spawn "urxvt -e /bin/zsh")
+    , ("M-x g", spawnOn "content" "google-chrome-stable")
     ]
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
@@ -293,7 +282,7 @@ defaults = def {
         clickJustFocuses   = myClickJustFocuses,
         borderWidth        = myBorderWidth,
         modMask            = myModMask,
-        workspaces         = myWorkspaces,
+        -- workspaces         = myWorkspaces,
         normalBorderColor  = myNormalBorderColor,
         focusedBorderColor = myFocusedBorderColor,
 
@@ -302,11 +291,13 @@ defaults = def {
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
-        layoutHook         = myLayout,
+        layoutHook         = showWName myLayout,
         manageHook         = myManageHook,
         handleEventHook    = myEventHook,
         logHook            = myLogHook,
-        startupHook        = myStartupHook
+        startupHook        = myStartupHook,
+
+        workspaces         = myWorkspaces
     }
 
 -- | Finally, a copy of the default bindings in simple textual tabular format.
