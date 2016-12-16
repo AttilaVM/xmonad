@@ -252,13 +252,13 @@ main = do
   xmonad $ defaults
     `additionalKeysP`
     [ ("M-x r", spawn "xmonad --recompile; xmonad --restart")
-    , ("M-S-`", spawn "dmenu_run")
+    , ("M-S-x", spawn "dmenu_run")
     , ("M-d", windows W.focusDown)
     , ("M-a", windows W.focusUp)
     , ("M-S-d", windows W.swapDown)
     , ("M-S-a", windows W.swapUp)
-    , ("M-S-q", shiftToNext)
-    , ("M-S-e", shiftToPrev)
+    , ("M-S-q", shiftNextScreen)
+    , ("M-S-e", shiftPrevScreen)
     , ("M-q", nextScreen)
     , ("M-e", prevScreen)
     , ("M-S-<Esc>", kill)

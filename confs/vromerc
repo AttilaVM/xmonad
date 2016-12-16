@@ -4,13 +4,19 @@ map k f
 map K F
 
 " Remap navigation
-map d 7j
-map e 7k
-map f 7l
-map s 7h
+map s 7j
+map w 7k
+map d 7l
+map a 7h
 
 " Remap tab navigation
-map w gT
-map r ge
+map q gT
+map e gt
 
+" kill tab
 map <C-k> dc
+map <C-M-k> do
+
+" scroll bottom&top
+map <M-a> gg
+map <M-d> G
