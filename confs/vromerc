@@ -1,7 +1,16 @@
-""" vrome configuration
-" Remap navigation keys
-map f j
-map k w
-map j s
-map h a
-map l f
+" vrome config
+" remap hinting
+map k f
+map K F
+
+" Remap navigation
+map d 7j
+map e 7k
+map f 7l
+map s 7h
+
+" Remap tab navigation
+map w gT
+map r ge
+
+map <C-k> dc
