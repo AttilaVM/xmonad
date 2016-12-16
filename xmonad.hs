@@ -65,7 +65,7 @@ myWorkspaces = withScreens 3 ["terminal", "systemMonitor", "torrent", "content",
 
 -- Border colors for unfocused and focused windows, respectively.
 --
-myNormalBorderColor  = "#dddddd"
+myNormalBorderColor  = "#000000"
 myFocusedBorderColor = "#fd971f"
 
 ------------------------------------------------------------------------
@@ -166,7 +166,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = avoidStruts (tiled ||| Mirror tiled ||| Full)
+myLayout = (tiled ||| Mirror tiled ||| Full)
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -248,7 +248,7 @@ myStartupHook = return ()
 main = do
   spawn "xsetroot -solid \"#272822\""
   spawn "xrdb Xresources"
-  xmproc <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
+  -- xmproc <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
   xmonad $ defaults
     `additionalKeysP`
     [ ("M-x r", spawn "xmonad --recompile; xmonad --restart")
@@ -268,6 +268,7 @@ main = do
     , ("M-x e", spawnOn "creation" "emacs")
     , ("M-x t", spawn "urxvt -e /bin/zsh")
     , ("M-x g", spawnOn "content" "google-chrome-stable")
+    , ("M-x b", spawn "blendernew")
     ]
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will

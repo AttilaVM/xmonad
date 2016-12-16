@@ -1,0 +1,7 @@
+""" vrome configuration
+" Remap navigation keys
+map f j
+map k w
+map j s
+map h a
+map l f
