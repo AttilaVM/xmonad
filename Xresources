@@ -1,9 +1,26 @@
 ! Based on: https://gist.githubusercontent.com/liangzan/1643690/raw/529ebf0de3b53f04ecdac6fdebb3dae1ec388ad5/.Xresources
 ! urxvt
+URxvt.perl-lib: ~/.xmonad/confs/urxvt-perls
 URxvt*buffered: true
 URxvt*cursorBlink: true
 URxvt*underlineColor: yellow
-urxvt*font: xft:Inconsolata-dz\ for\ Powerline:pixelsize=16
+! urxvt*font: xft:Inconsolata-dz\ for\ Powerline:pixelsize=16
+! URxvt.font: xft:Inconsolata-dz for Powerline:size=16:antialias=true
+URxvt.font: xft:Inconsolata for Powerline:size=12:antialias=true
+!URxvt.imFont: xft:Inconsolata-dz for Powerline:size=16:antialias=true
+!URxvt.boldFont: xft:Inconsolata-dz for Powerline:size=16:antialias=true
+!URxvt.italicFont: xft:Inconsolata-dz for Powerline:size=16:antialias=true
+!URxvt.boldItalicFont: xft:Inconsolata-dz for Powerline:size=16:antialias=true
+
+! xft
+Xft.antialias:  true
+Xft.autohint:   false
+Xft.dpi:        96
+Xft.hinting:    true
+Xft.hitstyle:   hintslight
+Xft.lcdfilter:  lcddefault
+Xft.rgba:       rgb
+
 ! URxvt.letterSpace: 0   ! By deafult the kerning of urxvt for inconsolata powerline is to wide
 URxvt*depth: 32
 URxvt*borderless: 1
