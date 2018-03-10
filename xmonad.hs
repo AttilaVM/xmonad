@@ -81,7 +81,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- launch a terminal
     [ ((modm .|. mod1Mask, xK_t), spawn $ XMonad.terminal conf)
 
-
+    ,  ((modm .|. shiftMask, xK_q ), io (exitWith ExitSuccess))
 
 
     -- --  Reset the layouts on the current workspace to default
@@ -201,18 +201,28 @@ myLayout =  ( TwoPane (3/100) (1/2) ||| Full ||| Grid )
 -- To match on the WM_NAME, you can use 'title' in the same way that
 -- 'className' and 'resource' are used below.
 --
+
+defManagement =
+  composeAll
+  [ className =? "Soffice"        --> doFullFloat
+  , stringProperty "_NET_WM_WINDOW_TYPE" =? "_NET_WM_WINDOW_TYPE_DIALOG, _NET_WM_WINDOW_TYPE_NORMAL" --> doFullFloat
+  , isDialog --> doFullFloat
+  ]
+
 myManageHook =
   if Conf.displayNum > 1 then
     composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Gimp"           --> doFloat
     , className =? "Blender"        --> doFullFloat
+    , className =? "soffice"        --> doFullFloat
+    , className =? "soffice"        --> doFullFloat
     , className =? "Emacs"          --> doShift "3"
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore ]
-    <+> manageDocks
+    <+> manageDocks <+> defManagement
   else
-    manageDocks
+    defManagement <+> manageDocks
 
 -- myManageHook = composeOne [
 --   isKDETrayWindow -?> doIgnore,
@@ -270,7 +280,7 @@ main = do
     [ ("M-x r", spawn "xmonad --recompile; xmonad --restart")
     , ("M-b u", spawn "setxkbmap us; xmodmap $HOME/.Xmodmap")
     , ("M-b h", spawn "setxkbmap hu; xmodmap $HOME/.Xmodmap")
-    , ("M-;", spawn "run-app")
+    , ("M-;", spawn "$HOME/.xmonad/scripts/run-app.sh")
     , ("M-l", windows W.focusDown)
     , ("M-j", windows W.focusUp)
     , ("M-k", windows W.swapDown)
@@ -279,7 +289,6 @@ main = do
     , ("M-S-e", shiftPrevScreen)
     , ("M-q", nextScreen)
     , ("M-e", prevScreen)
-    , ("M-S-<Esc>", kill)
     , ("M-=", kill)
     , ("M-[", sendMessage Shrink)
     , ("M-]", sendMessage Expand)
@@ -290,10 +299,19 @@ main = do
     , ("M-o c c", spawnOn "development" "chromium")
     , ("M-o b", spawn "blender")
     , ("M-n", gotoMenu' "show-windows")
-    , ("M-p", commands >>= runCommand)
+    , ("M-p", comm >>= runCommand)
     , ("M-h", spawn "echo 2 | nc -w 1 -U /tmp/test.sock")
     , ("<Print>", spawn "screenshot")
     ]
+
+comm :: X [(String, X ())]
+comm = do
+    return $ otherCommands
+ where
+    otherCommands =
+        [  ("xprop" , spawn "$HOME/.xmonad/scripts/xprop.sh" )
+        ,  ("help" , spawn "$HOME/.xmonad/scripts/xmonad-help.sh" )
+        ]
 
 commands = defaultCommands
 

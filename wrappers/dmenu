@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+/run/current-system/sw/bin/dmenu -i -l 43 "$@"
