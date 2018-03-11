@@ -205,6 +205,7 @@ myLayout =  ( TwoPane (3/100) (1/2) ||| Full ||| Grid )
 defManagement =
   composeAll
   [ className =? "Soffice"        --> doFullFloat
+  , className =? "Pavucontrol"    --> doFullFloat
   , stringProperty "_NET_WM_WINDOW_TYPE" =? "_NET_WM_WINDOW_TYPE_DIALOG, _NET_WM_WINDOW_TYPE_NORMAL" --> doFullFloat
   , isDialog --> doFullFloat
   ]
@@ -298,7 +299,7 @@ main = do
     , ("M-o c d", spawnOn "development" "chromium-debug")
     , ("M-o c c", spawnOn "development" "chromium")
     , ("M-o b", spawn "blender")
-    , ("M-n", gotoMenu' "show-windows")
+    , ("M-n", gotoMenu' "window-show")
     , ("M-p", comm >>= runCommand)
     , ("M-h", spawn "echo 2 | nc -w 1 -U /tmp/test.sock")
     , ("<Print>", spawn "screenshot")
@@ -311,6 +312,7 @@ comm = do
     otherCommands =
         [  ("xprop" , spawn "$HOME/.xmonad/scripts/xprop.sh" )
         ,  ("help" , spawn "$HOME/.xmonad/scripts/xmonad-help.sh" )
+        ,  ("sound" , spawn "pavucontrol" )
         ]
 
 commands = defaultCommands
