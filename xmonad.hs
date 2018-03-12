@@ -203,8 +203,8 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 
 myLayout =  ( TwoPane (3/100) (1/2) ||| Full ||| mouseResizableTile{ masterFrac = 0.5,
                                                                      fracIncrement = 0.05,
-                                                                     slaveFrac = 1,
-                                                                     draggerType = BordersDragger } )
+                                                                     slaveFrac = 0.5,
+                                                                     draggerType = FixedDragger 5 5 } )
   -- where
   --    -- default tiling algorithm partitions the screen into two panes
   --    tiled = Tall nmaster delta ratio
