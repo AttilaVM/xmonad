@@ -22,6 +22,17 @@ Actions
 M-h      Go to bookmark
 M-b h    Hungarian layout
 M-b u    US layout
+
+Mouse Gestures
+↑       Swap up
+↓       Swap down
+→       Move window to the Right screen
+←       Move window to the Left screen
+↓ →     Change layout
+↑ → ↓   Open application
+↓ → ↑   Close application
+
+
 end
 EOF
 

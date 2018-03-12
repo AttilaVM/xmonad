@@ -23,9 +23,14 @@ import XMonad.Layout.Grid -- Grid layout
 import XMonad.Hooks.DynamicLog
 import XMonad.Actions.WindowBringer -- dmenu interface
 import XMonad.Actions.Commands -- Invoke Xmonad actions with dmenu
+import XMonad.Actions.MouseGestures
+import XMonad.Actions.UpdatePointer
+import XMonad.Layout.MouseResizableTile
+
+import qualified XMonad.StackSet as W
 -- Debug
 import XMonad.Layout.ShowWName
-import UserConfig as Conf
+-- import Internal.UserConfig as Conf
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -144,6 +149,24 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events
 --
+
+gestures = M.fromList
+        [ ([], focus)
+        , ([U], \w -> focus w >> windows W.swapUp)
+        , ([D], \w -> focus w >> windows W.swapDown)
+        , ([L], \w -> focus w >> shiftNextScreen)
+        , ([R], \w -> focus w >> shiftPrevScreen)
+        , ([D, R], \_ -> sendMessage NextLayout)
+        , ([U, R, D], \_ -> spawn "$HOME/.xmonad/scripts/run-app.sh")
+        , ([D, R, U], \_ -> kill)
+        ]
+
+gestures2 = M.fromList
+        [ ([], focus)
+        , ([L], \w -> sendMessage Shrink)
+        , ([R], \w -> sendMessage Expand)
+        ]
+
 myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- mod-button1, Set the window to floating mode and move by dragging
@@ -151,7 +174,13 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
                                        >> windows W.shiftMaster))
 
     -- mod-button2, Raise the window to the top of the stack
-    , ((modm, button2), (\w -> focus w >> windows W.shiftMaster))
+    -- , ((modm, button2), (\w -> focus w >> windows W.shiftMaster))
+
+    , ((modm, button2), mouseGesture gestures)
+
+    , ((modm .|. shiftMask, button2), mouseGesture gestures2)
+
+
 
     -- mod-button3, Set the window to floating mode and resize by dragging
     , ((modm, button3), (\w -> focus w >> mouseResizeWindow w
@@ -172,7 +201,10 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- which denotes layout choice.
 --
 
-myLayout =  ( TwoPane (3/100) (1/2) ||| Full ||| Grid )
+myLayout =  ( TwoPane (3/100) (1/2) ||| Full ||| mouseResizableTile{ masterFrac = 0.5,
+                                                                     fracIncrement = 0.05,
+                                                                     slaveFrac = 1,
+                                                                     draggerType = BordersDragger } )
   -- where
   --    -- default tiling algorithm partitions the screen into two panes
   --    tiled = Tall nmaster delta ratio
@@ -211,7 +243,7 @@ defManagement =
   ]
 
 myManageHook =
-  if Conf.displayNum > 1 then
+  if 3 > 1 then
     composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Gimp"           --> doFloat
@@ -250,10 +282,10 @@ myEventHook = mempty <+> docksEventHook
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
 myLogHook xmproc =
-  dynamicLogWithPP $
+  dynamicLogWithPP
   xmobarPP {
   ppOutput = hPutStrLn xmproc
-  }
+  } >> updatePointer (0.5, 0.5) (0, 0)
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -273,7 +305,7 @@ myStartupHook = return ()
 main = do
   spawn "$HOME/.xmonad/scripts/setup.sh"
   spawn "xsetroot -solid \"#272822\""
-  spawn "xrdb Xresources"
+  spawn "xrdb $HOME/.xmonad/Xresources"
   spawn "xmodmap $HOME/.Xmodmap"
   xmproc <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
   xmonad $ defaults xmproc
@@ -286,10 +318,10 @@ main = do
     , ("M-j", windows W.focusUp)
     , ("M-k", windows W.swapDown)
     , ("M-i", windows W.swapUp)
-    , ("M-S-q", shiftNextScreen)
-    , ("M-S-e", shiftPrevScreen)
-    , ("M-q", nextScreen)
-    , ("M-e", prevScreen)
+    , ("M-C-j", shiftNextScreen)
+    , ("M-C-l", shiftPrevScreen)
+    , ("M-S-j", nextScreen)
+    , ("M-S-l", prevScreen)
     , ("M-=", kill)
     , ("M-[", sendMessage Shrink)
     , ("M-]", sendMessage Expand)
@@ -303,6 +335,7 @@ main = do
     , ("M-p", comm >>= runCommand)
     , ("M-h", spawn "echo 2 | nc -w 1 -U /tmp/test.sock")
     , ("<Print>", spawn "screenshot")
+    , ("M-t", withFocused $ windows . W.sink)
     ]
 
 comm :: X [(String, X ())]
