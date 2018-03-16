@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+layouts="us\nhu qwerty"
+
+read -r layout variant < <(echo -e "$layouts" | dmenu)
+
+echo "$layout - $variant"
+
+if [ "$variant" != "" ];then
+    setxkbmap -variant $variant $layout; xmodmap $HOME/.Xmodmap
+else
+    setxkbmap $layout; xmodmap $HOME/.Xmodmap
+fi

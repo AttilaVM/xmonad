@@ -26,6 +26,8 @@ import XMonad.Actions.Commands -- Invoke Xmonad actions with dmenu
 import XMonad.Actions.MouseGestures
 import XMonad.Actions.UpdatePointer
 import XMonad.Layout.MouseResizableTile
+import qualified XMonad.Layout.Magnifier as Mag
+import XMonad.Layout.Minimize
 
 import qualified XMonad.StackSet as W
 -- Debug
@@ -84,9 +86,8 @@ myFocusedBorderColor = "#fd971f"
 myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- launch a terminal
-    [ ((modm .|. mod1Mask, xK_t), spawn $ XMonad.terminal conf)
-
-    ,  ((modm .|. shiftMask, xK_q ), io (exitWith ExitSuccess))
+  [
+    ((modm .|. shiftMask, xK_q ), io (exitWith ExitSuccess))
 
 
     -- --  Reset the layouts on the current workspace to default
@@ -103,7 +104,6 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
 
     -- Push window back into tiling
-    , ((modm,               xK_t     ), withFocused $ windows . W.sink)
 
     -- Increment the number of windows in the master area
     -- , ((modm              , xK_comma ), sendMessage (IncMasterN 1))
@@ -118,13 +118,10 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- , ((modm              , xK_b     ), sendMessage ToggleStruts)
 
     -- Quit xmonad
-    , ((modm .|. shiftMask, xK_q     ), io (exitWith ExitSuccess))
 
     -- Restart xmonad
-    , ((modm              , xK_q     ), spawn "xmonad --recompile; xmonad --restart")
 
     -- Run xmessage with a summary of the default keybindings (useful for beginners)
-    , ((modm .|. shiftMask, xK_slash ), spawn ("echo \"" ++ help ++ "\" | xmessage -file -"))
     ]
     ++
 
@@ -159,6 +156,9 @@ gestures = M.fromList
         , ([D, R], \_ -> sendMessage NextLayout)
         , ([U, R, D], \_ -> spawn "$HOME/.xmonad/scripts/run-app.sh")
         , ([D, R, U], \_ -> kill)
+        , ([U, L, D], \_ -> sendMessage RestoreNextMinimizedWin)
+        , ([D, L, U], \_ -> withFocused minimizeWindow)
+        , ([U, L, U, R, D, L], \_ -> sendMessage Mag.Toggle)
         ]
 
 gestures2 = M.fromList
@@ -176,7 +176,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
     -- mod-button2, Raise the window to the top of the stack
     -- , ((modm, button2), (\w -> focus w >> windows W.shiftMaster))
 
-    , ((modm, button2), mouseGesture gestures)
+    , ((shiftMask, button2), mouseGesture gestures)
 
     , ((modm .|. shiftMask, button2), mouseGesture gestures2)
 
@@ -201,7 +201,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- which denotes layout choice.
 --
 
-myLayout =  ( TwoPane (3/100) (1/2) ||| Full ||| mouseResizableTile{ masterFrac = 0.5,
+myLayout = minimize $ Mag.magnifier ( TwoPane (3/100) (1/2) ||| Full ||| mouseResizableTile{ masterFrac = 0.5,
                                                                      fracIncrement = 0.05,
                                                                      slaveFrac = 0.5,
                                                                      draggerType = FixedDragger 5 5 } )
@@ -311,23 +311,27 @@ main = do
   xmonad $ defaults xmproc
     `additionalKeysP`
     [ ("M-x r", spawn "xmonad --recompile; xmonad --restart")
-    , ("M-b u", spawn "setxkbmap us; xmodmap $HOME/.Xmodmap")
-    , ("M-b h", spawn "setxkbmap hu; xmodmap $HOME/.Xmodmap")
     , ("M-;", spawn "$HOME/.xmonad/scripts/run-app.sh")
     , ("M-l", windows W.focusDown)
     , ("M-j", windows W.focusUp)
     , ("M-k", windows W.swapDown)
     , ("M-i", windows W.swapUp)
-    , ("M-C-j", shiftNextScreen)
-    , ("M-C-l", shiftPrevScreen)
+    , ("M-C-j", sequence_ [shiftNextScreen, nextScreen])
+    , ("M-C-l", sequence_ [shiftPrevScreen, prevScreen])
     , ("M-S-j", nextScreen)
     , ("M-S-l", prevScreen)
     , ("M-=", kill)
+    , ("M-`", kill)
     , ("M-[", sendMessage Shrink)
     , ("M-]", sendMessage Expand)
     , ("M-m", sendMessage NextLayout)
+    , ("M-'", sendMessage Mag.Toggle)
+    , ("M-3", sequence_ [withFocused minimizeWindow, windows W.shiftMaster])
+    , ("M-4", sendMessage RestoreNextMinimizedWin)
+    -- , ("M-q", windows W.swapDown)
+    -- , ("M-w", windows W.shiftMaster)
     , ("M-o e", spawnOn "development" "bash -c emacs")
-    , ("M-o t", spawn "alacritty")
+    , ("M-o t", spawn "alacritty -e 'tmuxinator start local'")
     , ("M-o c d", spawnOn "development" "chromium-debug")
     , ("M-o c c", spawnOn "development" "chromium")
     , ("M-o b", spawn "blender")
@@ -345,10 +349,21 @@ comm = do
     otherCommands =
         [  ("xprop" , spawn "$HOME/.xmonad/scripts/xprop.sh" )
         ,  ("help" , spawn "$HOME/.xmonad/scripts/xmonad-help.sh" )
+        ,  ("keyboard layout" , spawn "$HOME/.xmonad/scripts/keyboard-layout-change")
         ,  ("sound" , spawn "pavucontrol" )
         ]
-
 commands = defaultCommands
+
+--------------------------------------------------------------------------------
+-- | Modify all keybindings so that after they finish their action the
+-- mouse pointer is moved to the corner of the focused window.  This
+-- is a bit of a hack to work around some issues I have with
+-- @UpdatePointer@.
+withUpdatePointer :: [(String, X ())] -> [(String, X ())]
+withUpdatePointer = map addAction
+  where
+    addAction :: (String, X ()) -> (String, X ())
+    addAction (key, action) = (key, action >> updatePointer (0.98, 0.01) (0, 0))
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
