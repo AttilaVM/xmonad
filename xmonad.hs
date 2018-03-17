@@ -132,15 +132,15 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [((m .|. modm, k), windows $ onCurrentScreen f i)
         | (i, k) <- zip (workspaces' conf) [xK_1 .. xK_9]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
-    ++
+    -- ++
 
     --
     -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
     -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
     --
-    [((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
-        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+    -- [((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
+    --     | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
+    --     , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
 
 ------------------------------------------------------------------------
@@ -176,7 +176,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
     -- mod-button2, Raise the window to the top of the stack
     -- , ((modm, button2), (\w -> focus w >> windows W.shiftMaster))
 
-    , ((shiftMask, button2), mouseGesture gestures)
+    , ((modm, button2), mouseGesture gestures)
 
     , ((modm .|. shiftMask, button2), mouseGesture gestures2)
 
@@ -331,7 +331,7 @@ main = do
     -- , ("M-q", windows W.swapDown)
     -- , ("M-w", windows W.shiftMaster)
     , ("M-o e", spawnOn "development" "bash -c emacs")
-    , ("M-o t", spawn "alacritty -e 'tmuxinator start local'")
+    , ("M-o t", spawn "alacritty")
     , ("M-o c d", spawnOn "development" "chromium-debug")
     , ("M-o c c", spawnOn "development" "chromium")
     , ("M-o b", spawn "blender")
