@@ -2,7 +2,7 @@
 
 projectBasis=$(cat << EndOfMessage
 inkscape-icon
-blend4web
+inkscape-gui
 EndOfMessage
 			)
 
