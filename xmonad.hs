@@ -315,6 +315,8 @@ main = do
     , ("M-l", windows W.focusDown)
     , ("M-j", windows W.focusUp)
     , ("M-k", windows W.swapDown)
+    , ("M-1", windows W.focusUp)
+    , ("M-2", windows W.focusDown)
     , ("M-i", windows W.swapUp)
     , ("M-C-j", sequence_ [shiftNextScreen, nextScreen])
     , ("M-C-l", sequence_ [shiftPrevScreen, prevScreen])
@@ -335,6 +337,8 @@ main = do
     , ("M-o c d", spawnOn "development" "chromium-debug")
     , ("M-o c c", spawnOn "development" "chromium")
     , ("M-o b", spawn "blender")
+    , ("M-o k", spawn "krita")
+    , ("M-o g", spawn "gimp")
     , ("M-n", gotoMenu' "window-show")
     , ("M-p", comm >>= runCommand)
     , ("M-h", spawn "echo 2 | nc -w 1 -U /tmp/test.sock")
@@ -351,6 +355,7 @@ comm = do
         ,  ("help" , spawn "$HOME/.xmonad/scripts/xmonad-help.sh" )
         ,  ("keyboard layout" , spawn "$HOME/.xmonad/scripts/keyboard-layout-change")
         ,  ("sound" , spawn "pavucontrol" )
+        ,  ("project", spawn "$HOME/.xmonad/scripts/new-project.sh")
         ]
 commands = defaultCommands
 
