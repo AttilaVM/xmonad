@@ -332,7 +332,7 @@ main = do
     , ("M-4", sendMessage RestoreNextMinimizedWin)
     -- , ("M-q", windows W.swapDown)
     -- , ("M-w", windows W.shiftMaster)
-    , ("M-o e", spawnOn "development" "bash -c emacs")
+    , ("M-o e", spawnOn "development" "bash -c emacs-new")
     , ("M-o t", spawn "alacritty")
     , ("M-o c d", spawnOn "development" "chromium-debug")
     , ("M-o c c", spawnOn "development" "chromium")
