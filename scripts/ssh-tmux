@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# one liner to start tmux session on remote
+# source: http://marklodato.github.io/2013/10/31/autostart-tmux-on-ssh.html
+
+ssh -t $@ -- /bin/sh -c 'tmux has-session && exec tmux attach || exec tmux'
