@@ -1,0 +1,3 @@
+#!/bin/sh
+
+EMACS_CONFIG='~/.emacs.d/config.el' bash -c "emacs $EMACS_CONFIG $@"
