@@ -94,8 +94,9 @@ Config {
                              ] 50
 
         -- time and date indicator
+        -- It uses the same date format options as the "date" command.
         --   (%F = y-m-d date, %a = day of week, %T = h:m:s time)
-        , Run Date           "<fc=#ABABAB>%F (%a) %T</fc>" "date" 10
+        , Run Date           "<fc=#ABABAB>%F (%a) %H:%M</fc>" "date" 10
 
         -- keyboard layout indicator
         , Run Kbd            [ ("us(dvorak)" , "<fc=#00008B>DV</fc>")
