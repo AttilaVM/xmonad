@@ -333,7 +333,7 @@ main = do
     -- , ("M-q", windows W.swapDown)
     -- , ("M-w", windows W.shiftMaster)
     , ("M-o e", spawnOn "development" "bash -c emacs-new")
-    , ("M-o t", spawn "alacritty")
+    , ("M-o t", spawn "alacritty --command tmux new sh -c '\"$SHELL\"' ")
     , ("M-o c d", spawnOn "development" "chromium-debug")
     , ("M-o c c", spawnOn "development" "chromium")
     , ("M-o b", spawn "blender")
@@ -344,6 +344,9 @@ main = do
     , ("M-h", spawn "echo 2 | nc -w 1 -U /tmp/test.sock")
     , ("<Print>", spawn "screenshot")
     , ("M-t", withFocused $ windows . W.sink)
+    -- Media keys
+    , ("M-/ t", spawn "$HOME/.xmonad/scripts/touch-toggle.sh")
+    , ("<XF86TouchToggle>", spawn "$HOME/.xmonad/scripts/touch-toggle.sh")
     ]
 
 comm :: X [(String, X ())]
