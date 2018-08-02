@@ -22,7 +22,7 @@ executeAction() {
 		# Execute action
 		case "$action" in
 				"mount" )
-						(echo "$deviceName --> $mountPoint"; sleep 4) | dzen2 -bg darkred -fg grey80 -fn fixed
+						(echo "$deviceName --> $mountPoint"; sleep 4) | dzen2 -bg darkgreen -fg grey80 -fn fixed
 						;;
 				"Emacs" )
 						nohup emacsclient --socket-name /tmp/emacs1000/emacs-server-file "$mountPoint" </dev/null &>/dev/null &
@@ -51,6 +51,6 @@ stdbuf -oL -- udevadm monitor --udev -s block | while read -r -- eventCategory e
 				action=$(echo -e "$actions" | dmenu)
 				executeAction "$devname" "$action"
 		elif [ "$eventType" = "remove" ]; then
-				(echo "$devname is removed"; sleep 2) | dzen2 -bg darkred -fg grey80 -fn fixed
+				(echo "$devname is removed"; sleep 2) | dzen2 -bg darkgreen -fg grey80 -fn fixed
 		fi
 done
