@@ -359,6 +359,7 @@ comm = do
         ,  ("keyboard layout" , spawn "$HOME/.xmonad/scripts/keyboard-layout-change")
         ,  ("sound" , spawn "pavucontrol" )
         ,  ("project", spawn "$HOME/.xmonad/scripts/new-project.sh")
+        , ("external storage", spawn "$HOME/.xmonad/scripts/unmounter.sh")
         ]
 commands = defaultCommands
 
