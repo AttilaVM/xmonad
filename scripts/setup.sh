@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+xrandr --auto --output DP-1 --mode 1920x1200 --right-of HDMI-1
+
 # turn on num lock
 xdotool key Num_Lock
 xsetroot -cursor_name left_ptr
