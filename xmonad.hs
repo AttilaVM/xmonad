@@ -72,7 +72,7 @@ myModMask       = mod4Mask
 --
 -- myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 
-myWorkspaces = withScreens 1 ["Development", "Graphics", "torrent", "content", "monitor"]
+myWorkspaces = withScreens 1 ["Development", "connections", "media", "misc"]
 
 
 -- Border colors for unfocused and focused windows, respectively.
@@ -88,6 +88,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- launch a terminal
   [
     ((modm .|. shiftMask, xK_q ), io (exitWith ExitSuccess))
+
 
 
     -- --  Reset the layouts on the current workspace to default
@@ -129,8 +130,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- mod-[1..9], Switch to workspace N
     -- mod-shift-[1..9], Move client to workspace N
     --
-    [((m .|. modm, k), windows $ onCurrentScreen f i)
-        | (i, k) <- zip (workspaces' conf) [xK_1 .. xK_9]
+
+    [((m .|. modm, k), windows $ f i)
+        | (i, k) <- zip myWorkspaces [xK_8, xK_9, xK_0]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
     -- ++
 
@@ -332,10 +334,10 @@ main = do
     , ("M-4", sendMessage RestoreNextMinimizedWin)
     -- , ("M-q", windows W.swapDown)
     -- , ("M-w", windows W.shiftMaster)
-    , ("M-o e", spawnOn "development" "bash -c emacs-new")
+    , ("M-o e", spawnOn "development" "emacs")
     , ("M-o t", spawn "alacritty")
     , ("M-o c d", spawnOn "development" "chromium-debug")
-    , ("M-o c c", spawnOn "development" "chromium")
+    , ("M-o c c", spawnOn "development" "chromium-browser")
     , ("M-o b", spawn "blender")
     , ("M-o k", spawn "krita")
     , ("M-o g", spawn "gimp")
