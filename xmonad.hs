@@ -338,6 +338,7 @@ main = do
     , ("M-o t", spawn "alacritty")
     , ("M-o c d", spawnOn "development" "chromium-debug")
     , ("M-o c c", spawnOn "development" "chromium-browser")
+    , ("M-o v", spawnOn "development" "virt-manager")
     , ("M-o b", spawn "blender")
     , ("M-o k", spawn "krita")
     , ("M-o g", spawn "gimp")
