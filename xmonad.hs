@@ -359,6 +359,8 @@ comm = do
         ,  ("sound" , spawn "pavucontrol" )
         ,  ("project", spawn "$HOME/.xmonad/scripts/new-project.sh")
         ,  ("Screenshot-rectangular", spawn "$HOME/.xmonad/scripts/screenshot-rectangular.sh")
+        ,  ("xcape-emacs" , spawn "$HOME/.xmonad/scripts/xcape-emacs" )
+        ,  ("xcape-reset" , spawn "$HOME/.xmonad/scripts/xcape-reset" )
         ]
 commands = defaultCommands
 

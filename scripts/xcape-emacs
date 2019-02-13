@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+killall xcape &> /dev/null
+setxkbmap -model pc105 -layout us,hu -variant ,qwerty -option grp:shifts_toggle
+xmodmap $HOME/.Xmodmap
+# xcape -t 200 -e 'Hyper_L=Insert;Alt_L=Tab'
+xcape -t 200 -e "Hyper_L=Insert;Alt_L=Tab;Alt_R=Return"

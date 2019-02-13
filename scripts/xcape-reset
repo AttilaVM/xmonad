@@ -1,0 +1,4 @@
+#!/bin/bash
+
+killall xcape
+setxkbmap -model pc105 -layout us,hu -variant ,qwerty -option grp:shifts_toggle
